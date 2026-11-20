@@ -1,0 +1,11 @@
+{
+  "name": "dim-sdk",
+  "private": true,
+  "workspaces": ["apps/docs", "packages/zoom-map"],
+  "scripts": {
+    "dev": "bun run --cwd packages/zoom-map build && bun run --cwd apps/docs dev",
+    "build": "bun run --cwd packages/zoom-map build && bun run --cwd apps/docs build",
+    "check": "bun run --cwd packages/zoom-map build && bun run --cwd packages/zoom-map check && bun run --cwd apps/docs check",
+    "test": "bun run --cwd packages/zoom-map build && bun run --cwd packages/zoom-map test && bun run --cwd apps/docs test"
+  }
+}

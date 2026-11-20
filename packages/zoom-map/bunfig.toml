@@ -1,0 +1,3 @@
+# DOM untuk test controller (createZoomMap) tanpa browser.
+[test]
+preload = ["./test/dom.ts"]

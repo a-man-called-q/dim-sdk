@@ -1,0 +1,508 @@
+/*
+ * Isi peta zoom: panggung, kotak, panah, daftar panah, daftar alur, dan skala level.
+ * Arah visual: apps/docs/DESIGN.md (peta cetak). Tata letak di sekitar peta milik pemakai.
+ *
+ * Token yang wajib diisi pemakai di elemen `.zm-map` atau leluhurnya:
+ *   --zm-ink            teks paling kuat, garis skala dan kotak yang bisa dibuka
+ *   --zm-text           teks biasa
+ *   --zm-muted          teks redup (label jenis, tech, keterangan)
+ *   --zm-paper          latar
+ *   --zm-rule           garis tipis (pemisah baris kartu, batas hover)
+ *   --zm-hover          latar hover
+ *   --zm-accent         garis fokus keyboard
+ *   --zm-route          rute yang sedang dilihat (vermilion)
+ *   --zm-edge           panah biasa
+ *   --zm-place-bg, --zm-place-border, --zm-region-border
+ *   --zm-font-mono, --zm-text-xs, --zm-text-sm
+ *
+ * Ukuran `.zm-stage` bawaan: piksel tetap (--zm-w x --zm-h). Pemakai boleh menimpa `width`.
+ */
+
+.zm-map {
+	color: var(--zm-text);
+}
+
+/* Kontrol level digambar seperti skala peta: segmen berjajar dengan garis tinta. */
+.zm-scale {
+	display: inline-flex;
+	max-width: 100%;
+	border: 1.5px solid var(--zm-ink);
+	border-radius: 2px;
+}
+
+.zm-level {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	flex: 1 1 auto;
+	min-height: 44px;
+	min-width: 0;
+	padding: 0.3rem 0.6rem;
+	border: 0;
+	border-inline-start: 1.5px solid var(--zm-ink);
+	background: var(--zm-paper);
+	color: var(--zm-ink);
+	font: inherit;
+	line-height: 1.15;
+	text-align: start;
+}
+
+.zm-level:first-child {
+	border-inline-start: 0;
+}
+
+.zm-level-z {
+	font-family: var(--zm-font-mono);
+	font-size: var(--zm-text-xs);
+	font-weight: 600;
+}
+
+.zm-level-name {
+	font-size: var(--zm-text-sm);
+}
+
+.zm-level:hover {
+	background: var(--zm-hover);
+}
+
+.zm-level[aria-pressed='true'] {
+	background: var(--zm-ink);
+	color: var(--zm-paper);
+}
+
+.zm-level:focus-visible {
+	outline: 2px solid var(--zm-accent);
+	outline-offset: 2px;
+	position: relative;
+}
+
+.zm-level:active {
+	transform: translateY(1px);
+}
+
+/*
+ * Panggung: posisi kotak dalam persen, ukuran teks dalam --u (satu unit layout).
+ * Bawaannya satu unit = 1px; pemakai yang menimpa lebar ikut menskalakan teks.
+ */
+.zm-stage {
+	--u: calc(100cqw / var(--zm-w));
+	position: relative;
+	container-type: inline-size;
+	width: calc(var(--zm-w) * 1px);
+	aspect-ratio: var(--zm-w) / var(--zm-h);
+}
+
+.zm-stage .zm-edges {
+	position: absolute;
+	inset: 0;
+	width: 100%;
+	height: 100%;
+	overflow: visible;
+	pointer-events: none;
+	/* Di atas wilayah, di bawah tempat: garis tidak menutupi nama di dalam kotak. */
+	z-index: 1;
+}
+
+.zm-stage .zm-badges {
+	z-index: 3;
+}
+
+.zm-stage .zm-edge {
+	stroke: var(--zm-edge);
+	stroke-width: 1.5;
+	vector-effect: non-scaling-stroke;
+}
+
+/* Relasi struktural (extends, implements, owns, refers): garis putus-putus, bukan kejadian runtime. */
+.zm-stage .zm-edge--structure {
+	stroke-dasharray: 5 4;
+}
+
+.zm-stage path.zm-edge {
+	fill: none;
+}
+
+.zm-stage .zm-edge.is-route {
+	stroke: var(--zm-route);
+	stroke-width: 3;
+}
+
+.zm-stage .zm-arrow path {
+	fill: var(--zm-edge);
+}
+
+.zm-stage .zm-arrow--route path {
+	fill: var(--zm-route);
+}
+
+.zm-stage :is(.zm-place, .zm-region, .zm-card, .zm-member) {
+	position: absolute;
+	box-sizing: border-box;
+	font-size: calc(var(--u) * 14);
+	line-height: 1.2;
+}
+
+/* Tempat: kotak solid. */
+.zm-stage .zm-place {
+	z-index: 2;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	gap: calc(var(--u) * 2);
+	padding: calc(var(--u) * 8) calc(var(--u) * 10);
+	border: 1.5px solid var(--zm-place-border);
+	border-radius: 3px;
+	background: var(--zm-place-bg);
+	color: var(--zm-ink);
+	font-family: inherit;
+	text-align: start;
+}
+
+.zm-stage .zm-place--opens {
+	border-width: 2px;
+	border-color: var(--zm-ink);
+}
+
+.zm-stage .zm-place--opens:hover {
+	background: var(--zm-hover);
+}
+
+/* Wilayah: batas putus-putus seperti batas administratif di peta. */
+.zm-stage .zm-region {
+	z-index: 0;
+	border: 1.5px dashed var(--zm-region-border);
+	border-radius: 2px;
+}
+
+/* Nama wilayah di atas, label jenis di bawahnya, supaya nama panjang tidak terpotong. */
+.zm-stage .zm-region-head {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: calc(var(--u) * 1);
+	width: 100%;
+	padding: calc(var(--u) * 6) calc(var(--u) * 10);
+	border: 0;
+	background: none;
+	color: var(--zm-ink);
+	font: inherit;
+	text-align: start;
+}
+
+.zm-stage button.zm-region-head:hover .zm-name {
+	text-decoration: underline;
+}
+
+.zm-stage :is(.zm-place, .zm-region-head):focus-visible {
+	outline: 2px solid var(--zm-accent);
+	outline-offset: 2px;
+}
+
+.zm-stage .zm-name {
+	max-width: 100%;
+	font-weight: 600;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+/* Label kelas fitur ala peta: small caps, tracking ringan. */
+.zm-stage .zm-kind {
+	font-size: 0.8em;
+	font-variant: small-caps;
+	letter-spacing: 0.04em;
+	color: var(--zm-muted);
+}
+
+.zm-stage .zm-tech {
+	font-family: var(--zm-font-mono);
+	font-size: 0.72em;
+	color: var(--zm-muted);
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+/* Kartu tipe (class, interface, struct): kotak solid seperti class diagram, isinya baris. */
+.zm-stage .zm-card {
+	z-index: 0;
+	border: 1.5px solid var(--zm-place-border);
+	border-radius: 3px;
+	background: var(--zm-place-bg);
+}
+
+.zm-stage .zm-card-head {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: calc(var(--u) * 1);
+	width: 100%;
+	padding: calc(var(--u) * 7) calc(var(--u) * 10);
+	border: 0;
+	background: none;
+	color: var(--zm-ink);
+	font: inherit;
+	text-align: start;
+}
+
+.zm-stage .zm-card-head > * {
+	max-width: 100%;
+}
+
+.zm-stage button.zm-card-head:hover .zm-name {
+	text-decoration: underline;
+}
+
+/* Notasi UML: tipe dan method abstract ditulis miring, member static digarisbawahi. */
+.zm-stage .zm-card.is-abstract .zm-name,
+.zm-stage .zm-member.is-abstract .zm-sig {
+	font-style: italic;
+}
+
+.zm-stage .zm-member.is-static .zm-sig {
+	text-decoration: underline;
+}
+
+.zm-stage .zm-member {
+	z-index: 2;
+	display: flex;
+	align-items: center;
+	gap: calc(var(--u) * 6);
+	padding: 0 calc(var(--u) * 10);
+	border-top: 1px solid var(--zm-rule);
+	background: var(--zm-place-bg);
+	color: var(--zm-text);
+	font-family: var(--zm-font-mono);
+	font-size: calc(var(--u) * 11.5);
+}
+
+/* Garis tebal memisahkan field dan method, seperti kompartemen class diagram. */
+.zm-stage .zm-member--divider {
+	border-top: 1.5px solid var(--zm-place-border);
+}
+
+.zm-stage .zm-vis {
+	flex: none;
+	width: 1ch;
+	color: var(--zm-muted);
+}
+
+.zm-stage .zm-sig {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+/* Nomor langkah flow di tengah panahnya. */
+.zm-stage .zm-step rect {
+	fill: var(--zm-route);
+}
+
+.zm-stage .zm-step text {
+	fill: var(--zm-paper);
+	font-family: var(--zm-font-mono);
+	font-size: 12px;
+	font-weight: 600;
+	text-anchor: middle;
+}
+
+.zm-stage .zm-more {
+	position: absolute;
+	top: calc(var(--u) * 4);
+	right: calc(var(--u) * 8);
+	font-weight: 600;
+	color: var(--zm-ink);
+}
+
+/*
+ * Kotak yang bisa dipilih (render dengan `selectable`): tempat daun dan baris kartu menjadi
+ * <button>. Docs tidak memakai mode ini, jadi aturan di bawah tidak mengubah tampilannya.
+ */
+.zm-stage button.zm-member {
+	border-width: 1px 0 0;
+	text-align: start;
+}
+
+.zm-stage button.zm-member--divider {
+	border-top-width: 1.5px;
+}
+
+.zm-stage button.zm-place:not(.zm-place--opens):hover,
+.zm-stage button.zm-member:hover {
+	background: var(--zm-hover);
+}
+
+.zm-stage button.zm-member:focus-visible,
+.zm-stage .zm-card-head:focus-visible {
+	outline: 2px solid var(--zm-accent);
+	outline-offset: -2px;
+}
+
+/*
+ * Kotak untuk elemen yang sedang dilihat di teks: garis vermilion yang lebih tebal.
+ * Vermilion di peta berarti "yang sedang dilihat", sama dengan rute yang disorot.
+ */
+.zm-stage .zm-place.is-current,
+.zm-stage .zm-card.is-current {
+	border-color: var(--zm-route);
+	box-shadow: inset 0 0 0 1.5px var(--zm-route);
+}
+
+.zm-stage .zm-region.is-current {
+	border: 2.5px dashed var(--zm-route);
+}
+
+.zm-stage .zm-member.is-current {
+	box-shadow: inset 0 0 0 2px var(--zm-route);
+}
+
+.zm-map .zm-routes-title {
+	margin: 0 0 0.4rem;
+	font-weight: 600;
+	color: var(--zm-ink);
+}
+
+.zm-routes .zm-route-list {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+	gap: 0.25rem 1rem;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.zm-routes .zm-route-list li {
+	margin: 0;
+}
+
+.zm-routes .zm-route {
+	display: flex;
+	flex-direction: column;
+	gap: 0.1rem;
+	width: 100%;
+	min-height: 44px;
+	padding: 0.35rem 0.5rem;
+	border: 1px solid transparent;
+	border-radius: 3px;
+	background: none;
+	color: var(--zm-text);
+	font: inherit;
+	text-align: start;
+}
+
+.zm-routes button.zm-route:hover {
+	border-color: var(--zm-rule);
+}
+
+.zm-routes .zm-route[aria-pressed='true'] {
+	border-color: var(--zm-route);
+}
+
+.zm-routes .zm-route:focus-visible {
+	outline: 2px solid var(--zm-accent);
+	outline-offset: 1px;
+}
+
+.zm-flows .zm-flow-list {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.5rem;
+}
+
+.zm-flows .zm-flow {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	min-height: 44px;
+	padding: 0.35rem 0.75rem;
+	border: 1.5px solid var(--zm-ink);
+	border-radius: 3px;
+	background: none;
+	color: var(--zm-ink);
+	font: inherit;
+	font-weight: 600;
+	text-align: start;
+}
+
+.zm-flows .zm-flow:hover {
+	background: var(--zm-hover);
+}
+
+.zm-flows .zm-flow[aria-pressed='true'] {
+	border-color: var(--zm-route);
+	box-shadow: inset 0 0 0 1px var(--zm-route);
+}
+
+.zm-flows .zm-flow:focus-visible {
+	outline: 2px solid var(--zm-accent);
+	outline-offset: 2px;
+}
+
+.zm-flows .zm-flow .zm-route-meta {
+	font-weight: 400;
+}
+
+.zm-flows .zm-flow-steps {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+	gap: 0.5rem 1rem;
+	margin: 0.75rem 0 0;
+	padding: 0;
+	list-style: none;
+}
+
+/* Nomor sama dengan penanda di tengah panah pada peta. */
+.zm-flows .zm-flow-steps li {
+	display: flex;
+	gap: 0.6rem;
+	align-items: flex-start;
+	margin: 0;
+}
+
+.zm-flows .zm-step-no {
+	flex: none;
+	min-width: 1.5rem;
+	padding: 0.05rem 0.3rem;
+	border-radius: 3px;
+	background: var(--zm-route);
+	color: var(--zm-paper);
+	font-family: var(--zm-font-mono);
+	font-size: var(--zm-text-sm);
+	font-weight: 600;
+	text-align: center;
+}
+
+.zm-flows .zm-step-text {
+	display: flex;
+	flex-direction: column;
+}
+
+.zm-flows .zm-flow-note {
+	margin: 0.6rem 0 0;
+	font-size: var(--zm-text-sm);
+	color: var(--zm-muted);
+}
+
+.zm-map .zm-route-ends {
+	color: var(--zm-ink);
+	font-weight: 600;
+}
+
+.zm-map .zm-route-meta {
+	font-size: var(--zm-text-sm);
+	color: var(--zm-muted);
+}
+
+.zm-routes .zm-empty {
+	margin: 0;
+	color: var(--zm-muted);
+}
+
+.zm-map .sr-only {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	overflow: hidden;
+	clip-path: inset(50%);
+	white-space: nowrap;
+}

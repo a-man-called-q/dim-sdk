@@ -6,6 +6,8 @@ DIM (Diagram In Markup) describes software architecture as a text model you can 
 npm install @dim/zoom-map
 ```
 
+The packaged SDK is also available from [GitHub Releases](https://github.com/a-man-called-q/dim-sdk/releases/tag/v0.1.0).
+
 ```ts
 import { compileProject, createMap, initDim } from '@dim/zoom-map';
 

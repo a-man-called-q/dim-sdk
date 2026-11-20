@@ -9,6 +9,8 @@ description: Validate models, export JSON, and format DIM files in TypeScript.
 npm install @dim/zoom-map
 ```
 
+The package is also available from [GitHub Releases](https://github.com/a-man-called-q/dim-sdk/releases/tag/v0.1.0).
+
 The SDK includes a WebAssembly runtime. Call and await `initDim()` before using the compiler, formatter, or map.
 
 ## Check one file

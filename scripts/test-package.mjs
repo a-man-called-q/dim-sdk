@@ -5,7 +5,7 @@ import { tmpdir } from 'node:os';
 import { basename, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const sdk = fileURLToPath(new URL('../packages/zoom-map/', import.meta.url));
+const sdk = fileURLToPath(new URL('../', import.meta.url));
 const temp = await mkdtemp(join(tmpdir(), 'dim-package-'));
 const consumer = join(temp, 'consumer');
 const packageName = '@dim/zoom-map';

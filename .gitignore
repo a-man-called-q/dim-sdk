@@ -3,8 +3,3 @@ node_modules/
 dist/
 .astro/
 .wrangler/
-/apps/docs/src/data/shop.json
-/apps/docs/src/data/shop-to-be.json
-/apps/docs/src/data/toko-tutorial.json
-
-/packages/zoom-map/LICENSE

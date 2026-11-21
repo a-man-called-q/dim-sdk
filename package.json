@@ -1,11 +1,38 @@
 {
-  "name": "dim-sdk",
-  "private": true,
-  "workspaces": ["apps/docs", "packages/zoom-map"],
+  "name": "@dim/zoom-map",
+  "description": "TypeScript compiler, formatter, and zoomable architecture maps for DIM",
+  "type": "module",
+  "version": "0.1.0",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./map.css": "./dist/map.css",
+    "./wasm": "./wasm/dim_web_bg.wasm",
+    "./vocab.json": "./wasm/vocab.json"
+  },
+  "devDependencies": {
+    "@happy-dom/global-registrator": "^21.0.4",
+    "@types/bun": "^1.4.4",
+    "typescript": "^6"
+  },
+  "license": "SEE LICENSE IN LICENSE",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dim-language/dim-sdk.git"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "files": [
+    "dist",
+    "wasm",
+    "LICENSE"
+  ],
   "scripts": {
-    "dev": "bun run --cwd packages/zoom-map build && bun run --cwd apps/docs dev",
-    "build": "bun run --cwd packages/zoom-map build && bun run --cwd apps/docs build",
-    "check": "bun run --cwd packages/zoom-map build && bun run --cwd packages/zoom-map check && bun run --cwd apps/docs check",
-    "test": "bun run --cwd packages/zoom-map build && bun run --cwd packages/zoom-map test && bun run --cwd apps/docs test"
+    "build": "bun scripts/verify-runtime.mjs && tsc -p tsconfig.build.json && cp src/map.css dist/map.css",
+    "check": "tsc --noEmit",
+    "test": "bun test"
   }
 }

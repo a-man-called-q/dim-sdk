@@ -30,7 +30,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          VERSION=$(node -p "require('./packages/zoom-map/package.json').version")
+          VERSION=$(node -p "require('./package.json').version")
           TARBALL="dim-zoom-map-${VERSION}.tgz"
           gh release download "v${VERSION}" --pattern "$TARBALL" --pattern SHA256SUMS --dir "$RUNNER_TEMP"
           cd "$RUNNER_TEMP"

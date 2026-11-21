@@ -4,7 +4,7 @@ import { compileProject, createMap, formatFile, initDim } from '../src/index.ts'
 
 test('the compiled WASM projects the shop fixture at Z2 and Z4', async () => {
 	await initDim();
-	const shop = new URL('../../../examples/shop/', import.meta.url);
+	const shop = new URL('./fixtures/shop/', import.meta.url);
 	const files = Object.fromEntries(readdirSync(shop).filter((name) => name.endsWith('.dim'))
 		.map((name) => [name, readFileSync(new URL(name, shop), 'utf8')]));
 	const compiled = compileProject('main.dim', files);

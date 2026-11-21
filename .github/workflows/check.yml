@@ -1,4 +1,4 @@
-name: Check SDK and docs
+name: Check DIM TypeScript SDK
 
 on:
   pull_request:
@@ -23,7 +23,7 @@ jobs:
           node-version: '24'
           package-manager-cache: false
       - run: bun install --frozen-lockfile
+      - run: bun run build
       - run: bun run check
       - run: bun run test
-      - run: bun run build
       - run: bun scripts/test-package.mjs
